@@ -42,6 +42,9 @@ return { -- inputmap.luau
         [Enum.KeyCode.A] = Vector2.new(-1, 0),
         [Enum.KeyCode.D] = Vector2.new(1, 0),
         Enum.KeyCode.Thumbstick1,
+		[UserInputService.TouchSwipe] = function(swipeDirection, numberOfFingers)
+			return Vector2.new(0, 0)
+		end
     }
 }
 

@@ -1,6 +1,6 @@
 export type DeviceType = "Desktop" | "Touch" | "Controller"
 export type Map<T> = { [Enum | string]: T } & { Enum.KeyCode | Enum.UserInputType }
-export type Input<T> = (Map<T>) -> { 
+export type Input = <T>(Map<T>) -> { 
     read: () -> (T, T),
     pressing: () -> boolean,
     pressed: () -> boolean,

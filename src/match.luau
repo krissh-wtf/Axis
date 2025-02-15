@@ -9,7 +9,7 @@
 		end,
 	}
 ```]]
-return function<T, V, R>(value: T, ...: V...)
+return function<T, V..., R>(value: T, ...: V...)
 	local args = {...}
 	return function(cases: {T | (T, V...) -> R}): R?
 		assert(type(cases) == 'table', "cases needs to be table")

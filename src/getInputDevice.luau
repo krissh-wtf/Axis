@@ -1,4 +1,4 @@
-local match = require(game:GetService("ReplicatedStorage").match)
+local match = require("match")
 local previousInputDevice = "Mouse"
 
 local function getInputDevice(input: { Name: string }): string

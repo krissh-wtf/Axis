@@ -6,41 +6,49 @@ local match = require("match")
 local MAXIMUM_GAMEPADS = 8
 local NEXT_HOLD_INDEX = 1
 
+local function _reset(input, controller, inputType)
+    table.insert(input.resets, {controller, inputType, false})
+end
+
 -- TODO: clamp in read?
-local function read(input)
-    return input.current, input.previous --clamp this?
+local function read(input, controller: number?)
+    local default = if input.vector then Vector2.zero else 0
+    return input.current[controller or 1] or default, input.previous[controller or 1] or default
 end
 
 -- TODO: benchmark type() vs typeof() on both numbers and vectors
-local function pressing(input)
-    local value = read(input)
-    local magnitude = if type(value) == "number" then value else value.Magnitude
+local function pressing(input, controller: number?)
+    local value = read(input, controller)
+    local magnitude = if input.vector then value.Magnitude else value
     return magnitude ~= 0
 end
 
-local function changed(input)
-    return input.current ~= input.previous
+local function changed(input, controller: number?)
+    return input.current[controller or 1] ~= input.previous[controller or 1]
 end
 
-local function pressed(input)
-    return changed(input) and pressing(input)
+local function pressed(input, controller: number?)
+    return changed(input, controller) and pressing(input, controller)
 end
 
-local function released(input)
-    return changed(input) and not pressing(input)
+local function released(input, controller: number?)
+    return changed(input, controller) and not pressing(input, controller)
 end
 
-local function hold(input, value)
+local function hold(input, value, controller: number?)
     local id = NEXT_HOLD_INDEX
     NEXT_HOLD_INDEX += 1
-    input.active[id] = value
+    input.active[controller or 1][id] = value or 1
     return function()
-        input.active[id] = nil
+        input.active[controller or 1][id] = nil
     end
 end
 
-local function reset(input)
-    --reset custom values (ex: mouse delta, mouse wheel)
+local function move(input, value, controller: number?)
+    local id = NEXT_HOLD_INDEX
+    NEXT_HOLD_INDEX += 1
+    input.active[controller or 1][id] = value or 1
+    _reset(input, controller or 1, id)
 end
 
 --[[
@@ -82,18 +90,23 @@ UserInputService.InputChanged:Connect(onInputChanged)
 
 local function map(input, keyMap)
     --disconnect previous connections
-    for _, connection in input do
+    for _, connection in input.connections do
         connection:Disconnect()
     end
+    input.vector = false
+    input.inputMap = keyMap
 
     --set up connections
     local group =  {}
-    for inputType, value in keyMap do
-        if type(inputType) == "number" then -- { Enum.KeyCode.MouseWheel }
-            inputType = value
-            value = 1 -- maybe get other values and set magnitude to 1
+    for index, value in keyMap do
+        local inputType = if type(index) == "number" then value else index
+        value = if type(index) == "number" then 1 else value
+        keyMap[index] = nil
+        keyMap[inputType] = value
+
+        if type(value) ~= "number" then -- assuming vector, else invalid input value
+            input.vector = true
         end
-        
 
         if inputType == Enum.UserInputType.MouseMovement then
             table.insert(input.connections, UserInputService.InputChanged:Connect(function(inputObject)
@@ -102,9 +115,16 @@ local function map(input, keyMap)
                 end
             end))
         elseif inputType == Enum.UserInputType.MouseWheel then
-
+            table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
+                if object.UserInputType ~= Enum.UserInputType.MouseWheel then
+                    return
+                end
+                local position = object.Position.Z
+                input.active[1][inputType] = position * value
+                _reset(input, 1, inputType)
+            end))
         elseif inputType == Enum.KeyCode.Thumbstick1 or inputType == Enum.KeyCode.Thumbstick2 then
-
+            -- TODO: connect to thumbsticks and multiply their position by value
         elseif inputType == UserInputService.TouchSwipe then
             table.insert(input.connections, inputType:Connect(function(direction: Enum.SwipeDirection)
                 input.active[1][inputType] = match(direction) {
@@ -122,6 +142,8 @@ local function map(input, keyMap)
                 end
                 input.active[1][inputType] = scale
             end))
+        else
+            table.insert(group, inputType)
         end
     end
 
@@ -130,24 +152,23 @@ local function map(input, keyMap)
             return
         end
 
-        local index = 1
+        local controller = 1
         for i = 2, MAXIMUM_GAMEPADS do
             if inputObject.UserInputType == Enum.UserInputType[`Gamepad{i}`] then
                 input.active[i] = input.active[i] or {}
-                index = i
+                controller = i
                 break
             end
         end
-        local active = input.active[index]
 
-
+        local active = input.active[controller]
         for _, enum in group do
             if inputObject.KeyCode ~= enum and inputObject.UserInputType ~= enum then
                 continue
             end
 
             active[enum] = if inputObject.UserInputState ~= Enum.UserInputState.End then
-                input.inputMap[enum] else nil
+                keyMap[enum] else nil
         end
     end
     table.insert(input.connections, UserInputService.InputBegan:Connect(inputBeganOrEnded))
@@ -155,29 +176,44 @@ local function map(input, keyMap)
 end
 
 local function update(input)
-    -- set last frame
-    input.previous = input.current
-
-    -- get current frame
-    local result = nil
-    for _, value in input.active do
-        if not result then
-            result = value
+    -- reset old values
+    for i, reset in input.resets do
+        if not reset[3] then
+            reset[3] = true
             continue
         end
-        result += value
+        input.active[reset[1]][reset[2]] = nil
+        input.resets[i] = nil
     end
-    input.current = result
+
+    -- iterate through all controllers
+    for i, set in input.active do
+        -- set last frame
+        input.previous[i] = input.current[i]
+
+        local result = nil -- sum current values
+		for key, value in set do
+			if not result then
+				result = value
+				continue
+			end
+			result += value
+		end
+
+        input.current[i] = result
+    end
 end
 
 local function new(inputMap)
     local input = {
-        vector = nil :: true?, -- should we do something like this to tell if it's a vector or not?
-        previous = nil,
+        vector = false,
+        current = {} :: { any },
+        previous = {} :: { any },
         frame = nil,
         active = {
-            {}, -- if there is a new gamepad, add a table for active axes
+            {}, -- separate input axes for each controller
         },
+        resets = {} :: {number | any}, --resets input on next update
         connections = {},
         inputMap = inputMap,
         mouseWheel = 0,
@@ -198,11 +234,11 @@ local function new(inputMap)
         hold = hold,
         map = map,
         update = update,
-        reset = reset
+        move = move,
     }
-    map(input, map)
+    map(input, inputMap)
 
     return input
 end
 
-return new :: types.Input
+return new :: types.InputConstructor

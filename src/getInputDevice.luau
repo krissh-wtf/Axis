@@ -1,7 +1,7 @@
 local match = require("match")
 local previousInputDevice = "Mouse"
 
-local function getInputDevice(input: { Name: string }): string
+local function getInputDevice(input: { Name: string } | Enum.UserInputType): string
 	local result = match(input.Name) {
 		"Gamepad1", "Gamepad",
 		"Gamepad2", "Gamepad",

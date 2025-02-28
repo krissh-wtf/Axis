@@ -1,0 +1,43 @@
+local inputMap = require(script.Parent.inputMap)
+
+local camera = workspace.CurrentCamera
+local jumpHoldTime = 0
+
+local MAX_JUMP_CHARGE = 1 -- seconds
+local MINIMUM_JUMP_PERCENTAGE = 0.3
+local JUMP_CHARGE_RATE = 2 -- exponent
+local JUMP_POWER = 100
+
+local function jump(deltaTime) 
+    if not camera.CameraSubject then
+        print("no humanoid")
+        return
+    end
+
+    local humanoid: Humanoid = camera.CameraSubject
+    humanoid.UseJumpPower = true
+
+    if humanoid:GetState() ~= Enum.HumanoidStateType.Running then
+        jumpHoldTime = 0
+        return
+    end
+
+    if inputMap.jump:released() then -- When the jump axis changed and is not held any more
+        print("JUMPED")
+        local power = JUMP_POWER * (
+            (1 - MINIMUM_JUMP_PERCENTAGE) * math.pow(
+                math.min(jumpHoldTime, MAX_JUMP_CHARGE) / MAX_JUMP_CHARGE,
+                JUMP_CHARGE_RATE
+            )  + MINIMUM_JUMP_PERCENTAGE
+        )
+        humanoid.JumpPower = power
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        jumpHoldTime = 0
+        return
+    end
+
+    humanoid.JumpPower = 0
+    jumpHoldTime = inputMap.jump:pressing() and (jumpHoldTime or 0) + deltaTime
+end
+
+return jump

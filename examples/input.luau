@@ -1,9 +1,9 @@
-local axis: any = nil
-
+local UserInputService = game:GetService("UserInputService")
+local axis = require("../src")
 local input = axis.input
 
 type DeviceType = "Desktop" | "Touch" | "Controller"
-local device = axis.device() :: DeviceType
+local device = axis:device() :: DeviceType
 --[[
 
 DEFINE ALL SENSITIVITY IN ACTIONS
@@ -16,7 +16,7 @@ input -> defines input axis
 
 
 -- INPUT OBJECT
-read -> return current sum
+read -> return current sum of all inputs
 pressing -> interpret current sum as boolean (value ~= 0)
 pressed -> if was not pressed last frame, and pressing this frame
 released -> if was pressed last frame, and not pressing this frame
@@ -28,47 +28,40 @@ getMap -> get all input axes
 
 ]]
 
+local pickUp = input {
+	Enum.KeyCode.E,
+}
+
+local pressing: boolean = pickUp:pressing()
+local changed: boolean = pickUp:changed()
+
+if pressing and changed then
+	print("you picked up the item")
+end
+
 return { -- inputmap.luau
-    block = input { Enum.KeyCode.F, Enum.KeyCode.T },
-    dodge = input { [Enum.KeyCode.Q] = 1 },
+    block = input {
+		Enum.KeyCode.F,
+		Enum.KeyCode.T, --implicitly say that when F or T is pressed, the value is 1
+	},
+    dodge = input {
+		[Enum.KeyCode.Q] = 1 --explicitly say that when Q is pressed, the value is 1
+	},
     zoom = input {
         [Enum.KeyCode.I] = 1,
-        [Enum.KeyCode.O] = -1,
-        Enum.UserInputType.MouseWheel,
+        [Enum.KeyCode.O] = -1, -- if O is pressed, the value of that inputis -1
+        Enum.UserInputType.MouseWheel, -- uses mouse wheel forward as 1 and backwards as -1
+		--[Enum.UserInputType.MouseWheel] = -1, -- multiplies mouse wheel values by -1
     },
     move = input {
-        [Enum.KeyCode.W] = Vector2.new(0, 1),
+        [Enum.KeyCode.W] = Vector2.new(0, 1), --explicitly define W's value in two dimensions
         [Enum.KeyCode.S] = Vector2.new(0, -1),
         [Enum.KeyCode.A] = Vector2.new(-1, 0),
         [Enum.KeyCode.D] = Vector2.new(1, 0),
         Enum.KeyCode.Thumbstick1,
+		--[Enum.KeyCode.Thumbstick1] = Vector2.new(0.5, 0.5), -- multiplies thumbstick values by 0.5
 		[UserInputService.TouchSwipe] = function(swipeDirection, numberOfFingers)
 			return Vector2.new(0, 0)
 		end
     }
 }
-
---[[
-
-local inputAxes = {
-	move = {
-		VirtualAxis2d.wasd(),
-		VirtualAxis2d.new({ up = Enum.KeyCode.ButtonR2, down = Enum.KeyCode.ButtonL2 })
-	},
-	zoom = {
-		Enum.UserInputType.MouseWheel,
-		VirtualAxis.new({
-			negative = Enum.KeyCode.DPadDown,
-			positive = Enum.KeyCode.DPadUp
-		}),
-		VirtualAxis.new({
-			positive = Enum.KeyCode.I,
-			negative = Enum.KeyCode.O
-		})
-	},
-	drag = {Enum.UserInputType.MouseMovement, Enum.KeyCode.Thumbstick2},
-	dragHold = {Enum.UserInputType.MouseButton2},
-	skipRadio = {Enum.KeyCode.G, Enum.KeyCode.DPadLeft},
-}
-
-]]

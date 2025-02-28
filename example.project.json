@@ -1,0 +1,24 @@
+{
+    "name": "axisExampleGame",
+    "tree": {
+      "$className": "DataModel",
+  
+      "ReplicatedStorage": {
+        "$path": "exampleGame/shared"
+      },
+  
+      "ServerScriptService": {
+        "Server": {
+          "$path": "exampleGame/server"
+        }
+      },
+  
+      "StarterPlayer": {
+        "StarterPlayerScripts": {
+          "Client": {
+            "$path": "exampleGame/client"
+          }
+        }
+      }
+    }
+  }

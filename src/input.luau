@@ -1,3 +1,4 @@
+--!strict
 local UserInputService = game:GetService("UserInputService")
 
 local types = require("types")
@@ -6,7 +7,7 @@ local match = require("match")
 local MAXIMUM_GAMEPADS = 8
 local NEXT_HOLD_INDEX = 1
 
-local function _reset(input, controller, inputType)
+local function _reset(input, controller: number, inputType)
     table.insert(input.resets, {controller, inputType, false})
 end
 

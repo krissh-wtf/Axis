@@ -12,11 +12,12 @@ local function getInputDevice(input: { Name: string } | Enum.UserInputType): str
 		"Gamepad7", "Gamepad",
 		"Gamepad8", "Gamepad",
 		"Touch", "Touch",
-		"MouseButton1", "Mouse",
-		"MouseButton2", "Mouse",
-		"MouseButton3", "Mouse",
-		"MouseMovement", "Mouse",
-		"MouseWheel", "Mouse"
+		"MouseButton1", "Desktop",
+		"MouseButton2", "Desktop",
+		"MouseButton3", "Desktop",
+		"MouseMovement", "Desktop",
+		"MouseWheel", "Desktop",
+		"Keyboard", "Desktop"
 	}
 	previousInputDevice = result or previousInputDevice
 	return previousInputDevice

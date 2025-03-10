@@ -3,7 +3,7 @@ local axis = require("../src")
 local input = axis.input
 
 type DeviceType = "Desktop" | "Touch" | "Controller"
-local device = axis:device() :: DeviceType
+local device = axis.device() :: DeviceType
 --[[
 
 DEFINE ALL SENSITIVITY IN ACTIONS
@@ -40,28 +40,28 @@ if pressing and changed then
 end
 
 return { -- inputmap.luau
-    block = input {
+	block = input {
 		Enum.KeyCode.F,
 		Enum.KeyCode.T, --implicitly say that when F or T is pressed, the value is 1
 	},
-    dodge = input {
+		dodge = input {
 		[Enum.KeyCode.Q] = 1 --explicitly say that when Q is pressed, the value is 1
 	},
-    zoom = input {
-        [Enum.KeyCode.I] = 1,
-        [Enum.KeyCode.O] = -1, -- if O is pressed, the value of that inputis -1
-        Enum.UserInputType.MouseWheel, -- uses mouse wheel forward as 1 and backwards as -1
+	zoom = input {
+		[Enum.KeyCode.I] = 1,
+		[Enum.KeyCode.O] = -1, -- if O is pressed, the value of that inputis -1
+		Enum.UserInputType.MouseWheel, -- uses mouse wheel forward as 1 and backwards as -1
 		--[Enum.UserInputType.MouseWheel] = -1, -- multiplies mouse wheel values by -1
-    },
-    move = input {
-        [Enum.KeyCode.W] = Vector2.new(0, 1), --explicitly define W's value in two dimensions
-        [Enum.KeyCode.S] = Vector2.new(0, -1),
-        [Enum.KeyCode.A] = Vector2.new(-1, 0),
-        [Enum.KeyCode.D] = Vector2.new(1, 0),
-        Enum.KeyCode.Thumbstick1,
+	},
+	move = input {
+		[Enum.KeyCode.W] = Vector2.new(0, 1), --explicitly define W's value in two dimensions
+		[Enum.KeyCode.S] = Vector2.new(0, -1),
+		[Enum.KeyCode.A] = Vector2.new(-1, 0),
+		[Enum.KeyCode.D] = Vector2.new(1, 0),
+		Enum.KeyCode.Thumbstick1,
 		--[Enum.KeyCode.Thumbstick1] = Vector2.new(0.5, 0.5), -- multiplies thumbstick values by 0.5
 		[UserInputService.TouchSwipe] = function(swipeDirection, numberOfFingers)
 			return Vector2.new(0, 0)
 		end
-    }
+	}
 }

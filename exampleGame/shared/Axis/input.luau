@@ -12,7 +12,7 @@ end
 
 -- TODO: clamp in read?
 local function read(input, controller: number?)
-    local default = if input.vector then Vector2.zero else 0
+    local default = if input.vector then vector.zero else 0
     return input.current[controller or 1] or default, input.previous[controller or 1] or default
 end
 
@@ -68,14 +68,14 @@ end
 
 local function onInputChanged(inputObject)
     if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-        state.mouseDelta = Vector2.new(inputObject.Delta.X, -inputObject.Delta.Y)
+        state.mouseDelta = vector.create(inputObject.Delta.X, -inputObject.Delta.Y)
     elseif inputObject.UserInputType == Enum.UserInputType.MouseWheel then
         state.mouseWheel = inputObject.Position.Z
     elseif inputObject.KeyCode == Enum.KeyCode.Thumbstick1 or inputObject.KeyCode == Enum.KeyCode.Thumbstick2 then
         local gamepad = inputObject.UserInputType
 
         state.gamepadThumbsticks[inputObject.KeyCode][gamepad] =
-            Vector2.new(inputObject.Position.X, inputObject.Position.Y)
+            vector.create(inputObject.Position.X, inputObject.Position.Y)
     end
 end
 
@@ -111,7 +111,7 @@ local function map(input, keyMap)
         if inputType == Enum.UserInputType.MouseMovement then
             table.insert(input.connections, UserInputService.InputChanged:Connect(function(inputObject)
                 if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-                    input.active[1][inputType] = Vector2.new(inputObject.Delta.X, -inputObject.Delta.Y)
+                    input.active[1][inputType] = vector.create(inputObject.Delta.X, -inputObject.Delta.Y)
                 end
             end))
         elseif inputType == Enum.UserInputType.MouseWheel then
@@ -128,10 +128,10 @@ local function map(input, keyMap)
         elseif inputType == UserInputService.TouchSwipe then
             table.insert(input.connections, inputType:Connect(function(direction: Enum.SwipeDirection)
                 input.active[1][inputType] = match(direction) {
-                    Enum.SwipeDirection.Left, Vector2.new(-1, 0),
-                    Enum.SwipeDirection.Right, Vector2.new(1, 0),
-                    Enum.SwipeDirection.Up, Vector2.new(0, 1),
-                    Enum.SwipeDirection.Down, Vector2.new(0, -1),
+                    Enum.SwipeDirection.Left, vector.create(-1, 0),
+                    Enum.SwipeDirection.Right, vector.create(1, 0),
+                    Enum.SwipeDirection.Up, vector.create(0, 1),
+                    Enum.SwipeDirection.Down, vector.create(0, -1),
                 }
             end))
         elseif inputType == UserInputService.TouchPinch then
@@ -219,7 +219,7 @@ local function new(inputMap)
         mouseWheel = 0,
         keycodes = {},
         mouseButtons = {},
-        mouseDelta = Vector2.zero,
+        mouseDelta = vector.zero,
         gamepadThumbsticks = {
             [Enum.KeyCode.Thumbstick1] = {},
             [Enum.KeyCode.Thumbstick2] = {},

@@ -6,17 +6,17 @@ local Axis = {
    input = constructor,
 }
 
-function Axis:update(inputs)
+function Axis.update(inputs)
    for _, input in inputs do
       input:update()
    end
 end
 
-function Axis:device(input)
+function Axis.device(input)
    return getInputDevice(input or UserInputService:GetLastInputType())
 end
 
-function Axis:clear()
+function Axis.clear()
    --forgot what the point of this was
    -- - clears all input mappings?
    -- - clears all input states?

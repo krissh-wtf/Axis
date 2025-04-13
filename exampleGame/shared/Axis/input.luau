@@ -6,35 +6,63 @@ local match = require(script.Parent.match)
 local MAXIMUM_GAMEPADS = 8
 local NEXT_HOLD_INDEX = 1
 
-local function _reset(input, controller, inputType)
+local function getGamepad(inputType)
+    for i = 2, MAXIMUM_GAMEPADS do
+        if inputType == Enum.UserInputType[`Gamepad{i}`] then
+            return i
+        end
+    end
+    return 1
+end
+
+--[[
+    Sets an input to reset the next update
+]]
+local function _reset(input, controller: number, inputType)
     table.insert(input.resets, {controller, inputType, false})
 end
 
--- TODO: clamp in read?
+--[[
+    Reads current and previous values for the axis
+]]
 local function read(input, controller: number?)
     local default = if input.vector then vector.zero else 0
     return input.current[controller or 1] or default, input.previous[controller or 1] or default
 end
 
--- TODO: benchmark type() vs typeof() on both numbers and vectors
+--[[
+    Gets whether the axis has any active input
+]]
 local function pressing(input, controller: number?)
     local value = read(input, controller)
     local magnitude = if input.vector then value.Magnitude else value
     return magnitude ~= 0
 end
 
+--[[
+    Gets whether an axis has changed since the last update
+]]
 local function changed(input, controller: number?)
     return input.current[controller or 1] ~= input.previous[controller or 1]
 end
 
+--[[
+    Gets whether the axis was activated this update
+]]
 local function pressed(input, controller: number?)
     return changed(input, controller) and pressing(input, controller)
 end
 
+--[[
+    Gets whether the axis was deactivated this update
+]]
 local function released(input, controller: number?)
     return changed(input, controller) and not pressing(input, controller)
 end
 
+--[[
+    Adds a temporary manual input to the axis, and provides a function to release it
+]]
 local function hold(input, value, controller: number?)
     local id = NEXT_HOLD_INDEX
     NEXT_HOLD_INDEX += 1
@@ -44,6 +72,9 @@ local function hold(input, value, controller: number?)
     end
 end
 
+--[[
+    Adds an input to the axis for a single frame
+]]
 local function move(input, value, controller: number?)
     local id = NEXT_HOLD_INDEX
     NEXT_HOLD_INDEX += 1
@@ -109,10 +140,13 @@ local function map(input, keyMap)
         end
 
         if inputType == Enum.UserInputType.MouseMovement then
+            input.vector = true
             table.insert(input.connections, UserInputService.InputChanged:Connect(function(inputObject)
-                if inputObject.UserInputType == Enum.UserInputType.MouseMovement then
-                    input.active[1][inputType] = vector.create(inputObject.Delta.X, -inputObject.Delta.Y)
+                if inputObject.UserInputType ~= Enum.UserInputType.MouseMovement then
+                    return
                 end
+                input.active[1][Enum.UserInputType.MouseMovement] = vector.create(inputObject.Delta.X, -inputObject.Delta.Y) * value
+                _reset(input, 1, Enum.UserInputType.MouseMovement)
             end))
         elseif inputType == Enum.UserInputType.MouseWheel then
             table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
@@ -120,14 +154,33 @@ local function map(input, keyMap)
                     return
                 end
                 local position = object.Position.Z
-                input.active[1][inputType] = position * value
-                _reset(input, 1, inputType)
+                input.active[1][Enum.UserInputType.MouseWheel] = position * value
+                _reset(input, 1, Enum.UserInputType.MouseWheel)
             end))
-        elseif inputType == Enum.KeyCode.Thumbstick1 or inputType == Enum.KeyCode.Thumbstick2 then
-            -- TODO: connect to thumbsticks and multiply their position by value
+        elseif inputType == Enum.KeyCode.Thumbstick1 then
+            input.vector = true
+            table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
+                if object.KeyCode ~= Enum.KeyCode.Thumbstick1 then
+                    return
+                end
+                local position = object.Position
+                input.active[getGamepad(object.UserInputType)][Enum.KeyCode.Thumbstick1] =
+                    vector.create(position.X, position.Y) * value
+            end))
+        elseif inputType == Enum.KeyCode.Thumbstick2 then
+            input.vector = true
+            table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
+                if object.KeyCode ~= Enum.KeyCode.Thumbstick2 then
+                    return
+                end
+                local position = object.Position
+                input.active[getGamepad(object.UserInputType)][Enum.KeyCode.Thumbstick1] =
+                    vector.create(position.X, position.Y) * value
+            end))
         elseif inputType == UserInputService.TouchSwipe then
-            table.insert(input.connections, inputType:Connect(function(direction: Enum.SwipeDirection)
-                input.active[1][inputType] = match(direction) {
+            input.vector = true
+            table.insert(input.connections, UserInputService.TouchSwipe:Connect(function(direction: Enum.SwipeDirection)
+                input.active[1][UserInputService.TouchSwipe] = value * match(direction) {
                     Enum.SwipeDirection.Left, vector.create(-1, 0),
                     Enum.SwipeDirection.Right, vector.create(1, 0),
                     Enum.SwipeDirection.Up, vector.create(0, 1),
@@ -135,12 +188,12 @@ local function map(input, keyMap)
                 }
             end))
         elseif inputType == UserInputService.TouchPinch then
-            table.insert(input.connections, inputType:Connect(function(_, scale, _, state, sunk)
+            table.insert(input.connections, UserInputService.TouchPinch:Connect(function(_, scale: number, _, state, sunk)
                 if state == Enum.UserInputState.End then
-                    input.active[1][inputType] = nil
+                    input.active[1][UserInputService.TouchPinch] = nil
                     return
                 end
-                input.active[1][inputType] = scale
+                input.active[1][UserInputService.TouchPinch] = scale
             end))
         else
             table.insert(group, inputType)
@@ -152,23 +205,16 @@ local function map(input, keyMap)
             return
         end
 
-        local controller = 1
-        for i = 2, MAXIMUM_GAMEPADS do
-            if inputObject.UserInputType == Enum.UserInputType[`Gamepad{i}`] then
-                input.active[i] = input.active[i] or {}
-                controller = i
-                break
-            end
-        end
-
+        local controller = getGamepad(inputObject.UserInputType)
+        input.active[controller] = input.active[controller] or {}
         local active = input.active[controller]
         for _, enum in group do
             if inputObject.KeyCode ~= enum and inputObject.UserInputType ~= enum then
                 continue
             end
 
-            active[enum] = if inputObject.UserInputState ~= Enum.UserInputState.End then
-                keyMap[enum] else nil
+            active[enum] = if inputObject.UserInputState == Enum.UserInputState.Begin or
+                inputObject.UserInputState == Enum.UserInputState.Change then keyMap[enum] else nil
         end
     end
     table.insert(input.connections, UserInputService.InputBegan:Connect(inputBeganOrEnded))

@@ -11,7 +11,7 @@ local axis = require(ReplicatedStorage.Axis)
 
 local camera = workspace.CurrentCamera
 
-local PLAYER_SNAP = vector.create(0, 4.5, 0)
+local PLAYER_SNAP = vector.create(0, 1.5, 0)
 local pitch, yaw = 0, 0
 local rotateCFrame = CFrame.Angles(0, 0, 0)
 local snapVector = Spring.new(PLAYER_SNAP, 16, 0.5)
@@ -38,6 +38,7 @@ local function cameraSystem(delta)
 	end
 	local pivot = humanoid.RootPart:GetPivot()
 	local current = inputMap.drag:read()
+	-- print("crrnt", current)
 	local drag = -current / 2
 	local holding = inputMap.dragHold:pressing()
 	camera.CameraType = Enum.CameraType.Scriptable
@@ -54,7 +55,6 @@ local function cameraSystem(delta)
 		* CFrame.Angles(math.rad(pitch), 0, 0)
 
 	local height = CFrame.new((pivot * CFrame.new(snapVector.Position)).Position)
-	camera.CameraType = Enum.CameraType.Custom
 	camera.CFrame = CFrame.lookAt(
 		(height * rotateCFrame):PointToWorldSpace(offsetVector.Position),
 		height.Position

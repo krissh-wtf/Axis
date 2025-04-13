@@ -1,5 +1,5 @@
 local match = require(script.Parent.match)
-local previousInputDevice = "Mouse"
+local previousInputDevice = "Desktop"
 
 local function getInputDevice(input: { Name: string } | Enum.UserInputType): string
 	local result = match(input.Name) {

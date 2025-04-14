@@ -7,8 +7,11 @@ local getInputDevice = require("./getInputDevice")
 	@class Axis
 	The Axis library used to define input axes, get devices, and update inputs
 ]=]
---[[
+--[=[
 	@within Axis
+	@function input
+	@param keyMap Map<T>
+	@return Input<T>
 	Creates a new input axis with the provided keymap
 	```lua
 	local attack = Axis.input {
@@ -16,33 +19,43 @@ local getInputDevice = require("./getInputDevice")
 		Enum.KeyCode.ButtonX,
 	}
 	```
-]]
+]=]
 local Axis = {
    input = constructor,
 }
 
---[[
+--[=[
 	@within Axis
+	@function update
 	Updates all the provided inputs as a shorthand
 	```lua
 	Axis.update(inputMap) 
 	```
-]]
+]=]
 function Axis.update(inputs: { [any]: types.Input<any> })
    for _, input in inputs do
-      input:update()
+	  input:update()
    end
 end
 
---[[
+--[=[
 	@within Axis
+	@function device
 	Gets the device of the provided UserInputType (or the last UserInputType if none is provided)
 	```lua
-	Axis.device() --gets device of last input
+	local device = Axis.device() --gets device of last input
+	if device == "Desktop" then
+		print("yay")
+	end
 	```
-]]
+]=]
 function Axis.device(input: Enum.UserInputType): types.DeviceType
    return getInputDevice(input or UserInputService:GetLastInputType())
 end
+
+export type DeviceType = types.DeviceType
+export type Map<T> = types.Map<T>
+export type Input<T> = types.Input<T>
+export type Axis = types.Axis
 
 return Axis :: types.Axis

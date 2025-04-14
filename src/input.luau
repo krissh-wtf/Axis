@@ -11,10 +11,10 @@ local match = require("match")
 
 local NEXT_HOLD_INDEX = 1
 
-local function deadzone(input, value: number): number
-    if value < input.deadzone or 0.3 then
-        return 0
-    end
+local function deadzone<T>(input: types.Input<T>, value: number): number
+	if value < input.deadzone or 0.3 then
+		return 0
+	end
 	return value
 end
 
@@ -41,73 +41,80 @@ local function _reset<T>(input: types.Input<T>, controller: number, inputType: a
 	input.resets[inputType] = {controller, false}-- maybe divide by controller too?
 end
 
---[[
+--[=[
 	@within Input
+	@method read
+	@param controller number?
+	@return T, T
 	Reads current and previous values for the axis
 	```lua
 	local current, previous = attack:read()  
 	```
-]]
+]=]
 local function read<T>(input: types.Input<T>, controller: number?): (T, T) 
 	local default = if input.vector then vector.zero else 0
 	return (input.current[controller or 1] or default) :: T, (input.previous[controller or 1] or default) :: T
 end
 
---[[
+--[=[
 	@within Input
+	@method pressing
+	@param controller number?
+	@return boolean
 	Gets whether the axis has any active input
-	```lua
-	attack:pressing()
-	```
-]]
+]=]
 local function pressing<T>(input: types.Input<T>, controller: number?): boolean
 	local value = read(input, controller)
 	local magnitude = if input.vector then value.Magnitude else value
 	return magnitude ~= 0
 end
 
---[[
+--[=[
 	@within Input
+	@method changed
+	@param controller number?
+	@return boolean
 	Gets whether an axis has changed since the last update
-	```lua
-	attack:changed()
-	```
-]]
+]=]
 local function changed<T>(input: types.Input<T>, controller: number?): boolean
 	return input.current[controller or 1] ~= input.previous[controller or 1]
 end
 
---[[
+--[=[
 	@within Input
+	@method pressed
+	@param controller number?
+	@return boolean
 	Gets whether the axis was activated this update
-	```lua
-	attack:pressed()
-	```
-]]
+]=]
 local function pressed<T>(input: types.Input<T>, controller: number?): boolean
 	return changed(input, controller) and pressing(input, controller)
 end
 
---[[
+--[=[
 	@within Input
+	@method released
+	@param controller number?
+	@return boolean
 	Gets whether the axis was deactivated this update
-	```lua
-	attack:released()
-	```
-]]
+]=]
 local function released<T>(input: types.Input<T>, controller: number?): boolean
 	return changed(input, controller) and not pressing(input, controller)
 end
 
---[[
+--[=[
 	@within Input
+	@method hold
+	@param value T
+	@param controller number?
+	@return () -> ()
 	Adds a temporary manual input to the axis, and provides a function to release it
 	```lua
 	local release = attack:hold(1) -- adds 1 to the axis
 	--release later
 	release() -- removes the added value
 	```
-]]
+]=]
 local function hold<T>(input: types.Input<T>, value: T, controller: number?): () -> ()
 	local id = NEXT_HOLD_INDEX
 	NEXT_HOLD_INDEX += 1
@@ -117,13 +124,13 @@ local function hold<T>(input: types.Input<T>, value: T, controller: number?): ()
 	end
 end
 
---[[
+--[=[
 	@within Input
+	@method move
+	@param value T
+	@param controller number?
 	Adds an input to the axis for a single frame
-	```lua
-	attack:move(1)
-	```
-]]
+]=]
 local function move<T>(input: types.Input<T>, value: T, controller: number?)
 	local id = NEXT_HOLD_INDEX
 	NEXT_HOLD_INDEX += 1
@@ -132,8 +139,10 @@ local function move<T>(input: types.Input<T>, value: T, controller: number?)
 end
 
 
---[[
+--[=[
 	@within Input
+	@method map
+	@param keyMap Map<T>
 	Maps input types to an input axis
 	```lua
 	attack:map {
@@ -143,7 +152,7 @@ end
 	-- or to clear all input mappings
 	attack:map {}
 	```
-]]
+]=]
 local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	--disconnect previous connections
 	for _, connection in input.connections do
@@ -152,9 +161,9 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	input.vector = false
 	input.inputMap = keyMap
 
-    if next(keyMap) == nil then
-        return
-    end
+	if next(keyMap) == nil then
+		return
+	end
 
 	--set up connections
 	local group =  {}
@@ -250,13 +259,11 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	table.insert(input.connections, UserInputService.InputEnded:Connect(inputBeganOrEnded))
 end
 
---[[
+--[=[
 	@within Input
+	@method update
 	Updates the current and previous values of the input axis
-	```lua
-	attack:update()
-	```
-]]
+]=]
 local function update<T>(input: types.Input<T>)
 	-- reset old values
 	for inputType, reset in input.resets do
@@ -297,7 +304,7 @@ local function new<T>(inputMap: types.Map<T> & { deadzone: number? }): types.Inp
 		resets = {}, --resets input on next update
 		connections = {},
 		inputMap = inputMap,
-        deadzone = inputMap.deadzone,
+		deadzone = inputMap.deadzone,
 
 		read = read,
 		pressing = pressing,

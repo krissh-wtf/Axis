@@ -1,0 +1,97 @@
+---
+title: Glossary
+sidebar_position: 1
+---
+
+import Link from "@docusaurus/Link";
+
+export const Item = ({ title, description, id }) => (
+    <div class="col margin-bottom--lg">
+        <div class="card">
+            <div class="card__header">
+                <h3 class="anchor" id={id} >
+                    {title}
+                    <a
+                        href={`#${id}`}
+                        class="hash-link"
+                        aria-label={`Direct link to ${title}`}
+                        title={`Direct link to ${title}`}
+                        style={{color: "#67AE6E"}}
+                    >​</a>
+                </h3>
+            </div>
+            <div class="card__body">{description}</div>
+        </div>
+    </div>
+);
+
+export const ROW_ONE = [
+    {
+        title: "Introduction",
+        id: "introduction",
+        description: <>
+            <ul>
+                <li><Link to="./Introduction/getting_started">Getting Started</Link></li>
+                <li><Link to="./Introduction/best_practices">Best Practices</Link></li>
+            </ul>
+        </>,
+    },
+    {
+        title: "Devices",
+        id: "devices",
+        description: <>
+            <ul>
+                <li><Link to="./Devices/desktop">Desktop</Link></li>
+                <li><Link to="./Devices/controller">Controller</Link></li>
+                <li><Link to="./Devices/touch">Touch</Link></li>
+            </ul>
+        </>,
+    },
+    {
+        title: "API",
+        id: "api",
+        description: <>
+            <ul>
+                <li><Link to="../api/Axis">Axis</Link></li>
+                <li><Link to="../api/Input">Input</Link></li>
+            </ul>
+        </>,
+    },
+];
+
+export const ROW_TWO = [
+    {
+        title: "Setup Guides",
+        id: "setup-guides",
+        description: <>
+            <ul>
+                <li><Link to="./setup_guides/matter">Matter</Link></li>
+                <li><Link to="./setup_guides/jecs">Jecs</Link></li>
+            </ul>
+        </>,
+    },
+    {
+        title: "API",
+        id: "api",
+        description: <>
+            <ul>
+                <li><Link to="../api/Axis">Axis</Link></li>
+                <li><Link to="../api/Input">Input</Link></li>
+            </ul>
+        </>,
+    },
+];
+
+export const GlossaryItems = ({ items }) => (
+    <div className="container">
+        <div class="row">
+            {items.map((props, idx) => (
+                <Item {...props} />
+            ))}
+        </div>
+    </div>
+);
+
+Here's a quick navigation of Planck's Docs.
+
+<GlossaryItems items={ ROW_ONE } />

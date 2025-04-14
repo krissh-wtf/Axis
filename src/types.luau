@@ -1,5 +1,15 @@
+--[=[
+    @within Axis
+    @type DeviceType "Desktop" | "Touch" | "Controller"
+]=]
 export type DeviceType = "Desktop" | "Touch" | "Controller"
+
+--[=[
+    @within Axis
+    @type Map<T> { [Enum | string]: T } & { Enum.KeyCode | Enum.UserInputType }
+]=]
 export type Map<T> = { [Enum | string]: T } & { Enum.KeyCode | Enum.UserInputType }
+
 export type Input<T> = {
     read: (Input<T>, controller: number?) -> (T, T),
     pressing: (Input<T>, controller: number?) -> boolean,

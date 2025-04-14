@@ -50,7 +50,7 @@ UserInputService.TouchPinch:Connect(function(touches: { Vector2 }, scale, veloci
 	if state ~= Enum.UserInputState.Change then
 		endPinch()
 	else
-		actions:move1D("zoom", (scale - previousScale) * PINCH_MULTI)
+		inputMap.zoom:move((scale - previousScale) * PINCH_MULTI)
 	end
 	previousScale = scale
 end)
@@ -67,7 +67,7 @@ UserInputService.TouchStarted:Connect(function(newTouch, processed)
 		return
 	end
 	
-	touch, previousPos, hold = newTouch, pos, actions:hold("dragHold")
+	touch, previousPos, hold = newTouch, pos, inputMap.dragHold:hold()
 end)
 
 UserInputService.TouchEnded:Connect(function(ending, processed)

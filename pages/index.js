@@ -88,7 +88,7 @@ function HomepageHeader() {
         </div>
       </div>
       <img
-        src="https://media.discordapp.net/attachments/997871955199926386/1361109643614486548/AxisLogo.png?ex=67fd8fa3&is=67fc3e23&hm=99479df432b0601c4c52787512719b227a74fe7cf1fe896b20268ea76ea07a61&=&format=webp&quality=lossless&width=911&height=911"
+        src="https://raw.githubusercontent.com/NeonD00m/Axis/refs/heads/main/images/logo.png"
         className="bigLogo"
         alt="Axis"
       />

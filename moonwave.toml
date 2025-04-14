@@ -14,7 +14,7 @@ favicon = "images/logo.png"
 organizationName = "NeonD00m"
 projectName = "Axis"
 url = "https://neond00m.github.io"
-baseUrl = "/axis/"
+baseUrl = "/Axis/"
 tagline = "An agnostic, simple and versatile input library for ECS"
 
 # [navbar]

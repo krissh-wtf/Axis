@@ -4,10 +4,10 @@
 
 #### _"The best ECS input library on the block. - From the feces suite"_
 
-Play the example game [here](http://rblx.games/119823868761655)
-
 <br>
 
 ### Getting Started
 
 Check out the [documentation](https://neond00m.github.io/Axis/)
+
+Play the [example game](http://rblx.games/119823868761655)

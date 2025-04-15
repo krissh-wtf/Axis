@@ -16,11 +16,11 @@ local inputMap = {
         Enum.KeyCode.ButtonA,
     },
 	zoom = input {
-		Enum.UserInputType.MouseWheel,
 		[Enum.KeyCode.DPadDown] = -1,
 		[Enum.KeyCode.DPadUp] = 1,
 		[Enum.KeyCode.I] = 1,
-		[Enum.KeyCode.O] = -1,   
+		[Enum.KeyCode.O] = -1,
+		Enum.UserInputType.MouseWheel,  
     },
 	drag = input {
         Enum.UserInputType.MouseMovement,

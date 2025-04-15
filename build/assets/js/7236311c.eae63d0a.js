@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunkdocs=self.webpackChunkdocs||[]).push([[191],{7676:e=>{e.exports=JSON.parse('[{"type":"link","href":"/api/Axis","label":"\u200bAxis"},{"type":"link","href":"/api/Input","label":"\u200bInput"}]')}}]);

@@ -33,7 +33,7 @@ local attack = Axis.input {
 
 In this example, three axes have been defined in the input, E, left click, and the right trigger on console. These axes for example are all positive (by default), meaning that each can either be equal to 0 or 1.
 ```lua
--- if any of the axes are equal to 1, the input is considered pressing
+-- if any of the above axes are equal to 1, the input is considered pressing
 if attack:pressing() then
 ...
 ```
@@ -106,6 +106,6 @@ local delta = mouse:read() -- mouse movement is a variable-magnitude vector, but
 
 ## More Information
 To read about more specific features for mobile and console support, check out the device support guides, or check out the [API](../../api/Axis) to start using Axis.
-- [Touch](../Devices/touch): `hold()` for UI touch controls
-- [Controller](../Devices/controller): `move()` for adding an input value for a single frame
-- Desktop: mouse stuff
+- [Touch](../Devices/touch): `hold()` and `move()` for UI touch controls
+- [Controller](../Devices/controller): controller numbers for handling multiple controllers
+- [Desktop](../Devices/desktop): mouse stuff

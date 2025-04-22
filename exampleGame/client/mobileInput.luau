@@ -3,8 +3,7 @@ local UserInputService = game:GetService("UserInputService")
 local inputMap = require(script.Parent.inputMap)
 local Camera = workspace.CurrentCamera
 
-local PINCH_MULTI = 10
-local TOUCH_SENSITIVITY = 1
+local PINCH_MULTI = 50
 local TOUCH_MULTI = Vector2.new(0.00945 * math.pi, -0.003375 * math.pi) * 40
 
 local touch: InputObject? = nil

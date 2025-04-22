@@ -16,15 +16,17 @@ local inputMap = {
         Enum.KeyCode.ButtonA,
     },
 	zoom = input {
-		[Enum.KeyCode.DPadDown] = -1,
-		[Enum.KeyCode.DPadUp] = 1,
-		[Enum.KeyCode.I] = 1,
-		[Enum.KeyCode.O] = -1,
-		Enum.UserInputType.MouseWheel,  
+		[Enum.KeyCode.DPadDown] = -2,
+		[Enum.KeyCode.DPadUp] = 2,
+		[Enum.KeyCode.I] = 2,
+		[Enum.KeyCode.O] = -2,
+		[Enum.UserInputType.MouseWheel] = 10,  
     },
 	drag = input {
         Enum.UserInputType.MouseMovement,
-        Enum.KeyCode.Thumbstick2
+        Enum.KeyCode.Thumbstick2,
+		[Enum.KeyCode.Left] = vector.create(-2, 0),
+		[Enum.KeyCode.Right] = vector.create(2, 0),
     },
 	dragHold = input {
         Enum.UserInputType.MouseButton2

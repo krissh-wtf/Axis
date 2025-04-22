@@ -177,6 +177,10 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 			input.vector = true
 		end
 
+		if inputType == Enum.KeyCode.Right or inputType == Enum.KeyCode.Left then
+			print("doing keymap for:", inputType, value)
+		end
+
 		if inputType == Enum.UserInputType.MouseMovement then
 			input.vector = true
 			table.insert(input.connections, UserInputService.InputChanged:Connect(function(inputObject)
@@ -231,9 +235,12 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 					input.active[1][UserInputService.TouchPinch] = nil
 					return
 				end
-				input.active[1][UserInputService.TouchPinch] = scale :: number & T
+				input.active[1][UserInputService.TouchPinch] = value * scale :: number & T
 			end))
 		else
+			if inputType == Enum.KeyCode.Right or inputType == Enum.KeyCode.Left then
+				print("added to general group:", inputType, value)
+			end
 			table.insert(group, inputType)
 		end
 	end
@@ -247,8 +254,13 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 		input.active[controller] = input.active[controller] or {}
 		local active = input.active[controller]
 		for _, enum in group do
+
 			if inputObject.KeyCode ~= enum and inputObject.UserInputType ~= enum then
 				continue
+			end
+
+			if enum == Enum.KeyCode.Right or enum == Enum.KeyCode.Left then
+				print(enum, "detected:", keyMap[enum]) 
 			end
 
 			active[enum] = (if inputObject.UserInputState == Enum.UserInputState.Begin or

@@ -5,19 +5,18 @@ local inputMap = require(script.Parent.inputMap)
 local gui = Client:WaitForChild("PlayerGui"):WaitForChild("TouchControls")
 
 -- example of touch controls
-local releaseCrouch = nil
+local crouching = false
 local crouchButton = gui:WaitForChild("crouch")
 
 crouchButton.MouseButton1Down:Connect(function()
-    if releaseCrouch then
-        releaseCrouch() -- release/destroy the hold when you want to disable it
-        releaseCrouch = nil
+    inputMap.crouch:move(1) -- by default the hold value is 1
+    crouching = not crouching
+    if not crouching then
         crouchButton.UIStroke.Thickness = 0
         crouchButton.Icon.ImageColor3 = Color3.new(1, 1, 1)
         crouchButton.Icon.Size = UDim2.fromScale(0.8, 0.8)
         return
     end
-    releaseCrouch = inputMap.crouch:hold() -- by default the hold value is 1
     crouchButton.UIStroke.Thickness = 2
     crouchButton.Icon.ImageColor3 = Color3.fromRGB(252, 255, 80)
     crouchButton.Icon.Size = UDim2.fromScale(0.7, 0.7)

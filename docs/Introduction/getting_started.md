@@ -12,12 +12,12 @@ Currently only available on [pesde](https://pesde.dev/packages/killergg/axis)
 ## Usage
 While this library is agnostic and doesn't require an ECS of any sort, it is definitely ECS-oriented since its meant to be run in systems. Input axes run on a frame by frame basis, meaning they need to be updated every frame.
 ```lua
-while wait() do
+RunService.RenderStepped:Connect(function()
     attack:update() -- update the input axes
     if attack:pressed() then -- fires once, when the input is newly pressed
         print("Attacked!")
     end
-end
+end)
 ```
 
 

@@ -1,3 +1,5 @@
+--!strict
+
 local UserInputService = game:GetService("UserInputService")
 local Axis = require(game.ReplicatedStorage.Axis)
 local input = Axis.input
@@ -20,7 +22,7 @@ local inputMap = {
 		[Enum.KeyCode.DPadUp] = 2,
 		[Enum.KeyCode.I] = 2,
 		[Enum.KeyCode.O] = -2,
-		[Enum.UserInputType.MouseWheel] = 10,  
+		[Enum.UserInputType.MouseWheel] = 10,
     },
 	drag = input {
         Enum.UserInputType.MouseMovement,

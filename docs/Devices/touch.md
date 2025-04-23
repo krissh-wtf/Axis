@@ -5,7 +5,6 @@ sidebar_position: 3
 ---
 
 # Touch
-
 Touch controls can often be one of the most difficult parts to implement well, since you need to consider much more factors in how players will interact with your game. Axis tries to give you a lot of power to adjust inputs however you want through `hold()` and `move()`.
 
 ### Hold

@@ -1,3 +1,4 @@
+--!strict
 --[=[
     @within Axis
     @type DeviceType "Desktop" | "Touch" | "Controller"
@@ -8,7 +9,8 @@ export type DeviceType = "Desktop" | "Touch" | "Controller"
     @within Axis
     @type Map<T> { [Enum | string]: T } & { Enum.KeyCode | Enum.UserInputType }
 ]=]
-export type Map<T> = { [Enum | string]: T } & { Enum.KeyCode | Enum.UserInputType }
+export type Map<T> = { [any]: any }
+--{ [Enum.UserInputType | Enum.KeyCode | string]: T } & { Enum.KeyCode | Enum.UserInputType }
 
 export type Input<T> = {
     read: (Input<T>, controller: number?) -> (T, T),
@@ -31,7 +33,7 @@ export type Input<T> = {
     inputMap: Map<T>,
 }
 
-export type InputConstructor = <T>(Map<T> & { deadzone: number? }) -> Input<T>
+export type InputConstructor = <T>(Map<T> | (Map<T> & { deadzone: number? })) -> Input<T>
 
 export type Axis = {
     device: (Enum.UserInputType) -> DeviceType,

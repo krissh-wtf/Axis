@@ -41,6 +41,8 @@ end
 --[=[
 	@within Axis
 	@function device
+	@param input Enum.UserInputType?
+	@return DeviceType
 	Gets the device of the provided UserInputType (or the last UserInputType if none is provided)
 	```lua
 	local device = Axis.device() --gets device of last input

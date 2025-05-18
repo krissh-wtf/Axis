@@ -98,7 +98,6 @@ These vector axes can also have weights, though the weights can only be values t
 local mouse = Axis.input {
     [Enum.UserInputType.MouseMovement] = 50,
     -- [Enum.UserInputType.MouseMovement] = Vector2.new(0, 1),
-    -- ^ You can't do this yet (as of v0.1) unfortunately
 }
 local delta = mouse:read() -- mouse movement is a variable-magnitude vector, but we still multiply by 50
 ```

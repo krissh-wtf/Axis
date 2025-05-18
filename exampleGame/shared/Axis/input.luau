@@ -12,7 +12,7 @@ local match = require(script.Parent.match)
 local NEXT_HOLD_INDEX = 1
 
 local function deadzone<T>(input: types.Input<T>, value: number): number
-	if value < input.deadzone or 0.3 then
+	if value < (input.deadzone or 0.3) then
 		return 0
 	end
 	return value

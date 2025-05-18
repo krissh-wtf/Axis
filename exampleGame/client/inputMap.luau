@@ -1,6 +1,4 @@
---!strict
-
-local UserInputService = game:GetService("UserInputService")
+--!nocheck
 local Axis = require(game.ReplicatedStorage.Axis)
 local input = Axis.input
 

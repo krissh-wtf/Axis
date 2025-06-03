@@ -8,6 +8,6 @@
 
 ### Getting Started
 
-Check out the [documentation](https://neond00m.github.io/Axis/)
+Check out the (incomplete) [documentation](https://neond00m.github.io/Axis/)
 
 Play the [example game](http://rblx.games/119823868761655)

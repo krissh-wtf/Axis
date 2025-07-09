@@ -51,7 +51,7 @@ end
 	end
 	```
 ]=]
-function Axis.device(input: Enum.UserInputType): types.DeviceType
+function Axis.device(input: Enum.UserInputType?): types.DeviceType
    return getInputDevice(input or UserInputService:GetLastInputType())
 end
 

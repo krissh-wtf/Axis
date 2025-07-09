@@ -36,7 +36,7 @@ export type Input<T> = {
 export type InputConstructor = <T>(Map<T> | (Map<T> & { deadzone: number? })) -> Input<T>
 
 export type Axis = {
-    device: (Enum.UserInputType) -> DeviceType,
+    device: (Enum.UserInputType?) -> DeviceType,
     update: (inputs: { [any]: Input<any> } ) -> nil,
     clear: (any) -> nil,
     input: InputConstructor,

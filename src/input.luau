@@ -65,7 +65,7 @@ end
 ]=]
 local function pressing<T>(input: types.Input<T>, controller: number?): boolean
 	local value = read(input, controller)
-	local magnitude = if input.vector then value.Magnitude else value
+	local magnitude = if input.vector then vector.magnitude(value) else value 
 	return magnitude ~= 0
 end
 
@@ -158,8 +158,15 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	for _, connection in input.connections do
 		connection:Disconnect()
 	end
-	input.vector = false
+	input.vector = nil -- nil, to be detected
 	input.inputMap = keyMap
+
+	local function setVector(vectorType)
+		if input.vector ~= nil and input.vector ~= vectorType then
+			error(`[Axis] Input axis cannot be both vector and non-vector. ({inputType} is {if vectorType then "" else "not "}a vector input)`)
+		end
+		input.vector = vectorType
+	end
 
 	if next(keyMap) == nil then
 		return
@@ -172,13 +179,10 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 		value = if type(index) == "number" then 1 else value
 		keyMap[index] = nil :: nil & T
 		keyMap[inputType] = value
-
-		if type(value) ~= "number" then -- assuming vector, else invalid input value
-			input.vector = true
-		end
+		setVector(if type(value) ~= "number" then true else false, inputType)
 
 		if inputType == Enum.UserInputType.MouseMovement then
-			input.vector = true
+			setVector(true, inputType)
 			table.insert(input.connections, UserInputService.InputChanged:Connect(function(inputObject)
 				if inputObject.UserInputType ~= Enum.UserInputType.MouseMovement then
 					return
@@ -196,7 +200,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 				_reset(input, 1, Enum.UserInputType.MouseWheel)
 			end))
 		elseif inputType == Enum.KeyCode.Thumbstick1 then
-			input.vector = true
+			setVector(true, inputType)
 			table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
 				if object.KeyCode ~= Enum.KeyCode.Thumbstick1 then
 					return
@@ -206,7 +210,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 					vector.create(deadzone(input, position.X), deadzone(input, position.Y)) * value
 			end))
 		elseif inputType == Enum.KeyCode.Thumbstick2 then
-			input.vector = true
+			setVector(true, inputType)
 			table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
 				if object.KeyCode ~= Enum.KeyCode.Thumbstick2 then
 					return
@@ -216,7 +220,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 					vector.create(deadzone(input, position.X), deadzone(input, position.Y)) * value
 			end))
 		elseif inputType == UserInputService.TouchSwipe then
-			input.vector = true
+			setVector(true, inputType)
 			table.insert(input.connections, UserInputService.TouchSwipe:Connect(function(direction: Enum.SwipeDirection)
 				input.active[1][UserInputService.TouchSwipe] = value * match(direction) {
 					Enum.SwipeDirection.Left, vector.create(-1, 0),

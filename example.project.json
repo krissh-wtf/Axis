@@ -4,7 +4,10 @@
       "$className": "DataModel",
   
       "ReplicatedStorage": {
-        "$path": "exampleGame/shared"
+        "$path": "exampleGame/shared",
+        "Axis": {
+          "$path": "src"
+        }
       },
   
       "ServerScriptService": {

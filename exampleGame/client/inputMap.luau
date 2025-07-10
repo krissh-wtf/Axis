@@ -29,7 +29,7 @@ local inputMap = {
 		[Enum.KeyCode.Right] = vector.create(2, 0),
     },
 	dragHold = input {
-        Enum.UserInputType.MouseButton2
+        Enum.UserInputType.MouseButton2,
     },
 }
 

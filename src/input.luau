@@ -158,28 +158,34 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	for _, connection in input.connections do
 		connection:Disconnect()
 	end
-	input.vector = nil -- nil, to be detected
-	input.inputMap = keyMap
 
-	local function setVector(vectorType)
+	--for detecting the type of value for this input axis for this keymap
+	input.vector = nil -- nil, to be detected
+	local previousType = nil
+	local function setVector(vectorType: boolean, inputType: any)
 		if input.vector ~= nil and input.vector ~= vectorType then
-			error(`[Axis] Input axis cannot be both vector and non-vector. ({inputType} is {if vectorType then "" else "not "}a vector input)`)
+			local pre = `{previousType} was {if input.vector then "" else "not "}a vector input`
+			local now = `{inputType} is {if vectorType then "" else "not "}a vector input`
+			error(`[Axis] Input axis cannot be both vector and scalar.\n\t({pre} and {now})`)
 		end
 		input.vector = vectorType
+		previousType = inputType
 	end
 
 	if next(keyMap) == nil then
-		return
+		return -- let the player clear the keymap with an empty table
 	end
 
 	--set up connections
 	local group =  {}
+	local newMap = {}
+	input.inputMap = newMap
 	for index, value in keyMap :: any do
 		local inputType = if type(index) == "number" then value else index
-		value = if type(index) == "number" then 1 else value
-		keyMap[index] = nil :: nil & T
-		keyMap[inputType] = value
-		setVector(if type(value) ~= "number" then true else false, inputType)
+		local modifier = if type(index) == "number" then 1 else value
+		newMap[index] = nil :: nil & T
+		newMap[inputType] = value
+		local autoType = if type(modifier) ~= "number" then true else false
 
 		if inputType == Enum.UserInputType.MouseMovement then
 			setVector(true, inputType)
@@ -187,16 +193,17 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 				if inputObject.UserInputType ~= Enum.UserInputType.MouseMovement then
 					return
 				end
-				input.active[1][Enum.UserInputType.MouseMovement] = vector.create(inputObject.Delta.X, -inputObject.Delta.Y) * value
+				input.active[1][Enum.UserInputType.MouseMovement] = vector.create(inputObject.Delta.X, -inputObject.Delta.Y) * modifier
 				_reset(input, 1, Enum.UserInputType.MouseMovement)
 			end))
 		elseif inputType == Enum.UserInputType.MouseWheel then
+			setVector(autoType, inputType)
 			table.insert(input.connections, UserInputService.InputChanged:Connect(function(object)
 				if object.UserInputType ~= Enum.UserInputType.MouseWheel then
 					return
 				end
 				local position = object.Position.Z
-				input.active[1][Enum.UserInputType.MouseWheel] = position * value
+				input.active[1][Enum.UserInputType.MouseWheel] = position * modifier
 				_reset(input, 1, Enum.UserInputType.MouseWheel)
 			end))
 		elseif inputType == Enum.KeyCode.Thumbstick1 then
@@ -207,7 +214,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 				end
 				local position = object.Position
 				input.active[getGamepad(object.UserInputType)][Enum.KeyCode.Thumbstick1] =
-					vector.create(deadzone(input, position.X), deadzone(input, position.Y)) * value
+					vector.create(deadzone(input, position.X), deadzone(input, position.Y)) * modifier
 			end))
 		elseif inputType == Enum.KeyCode.Thumbstick2 then
 			setVector(true, inputType)
@@ -217,12 +224,12 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 				end
 				local position = object.Position
 				input.active[getGamepad(object.UserInputType)][Enum.KeyCode.Thumbstick1] =
-					vector.create(deadzone(input, position.X), deadzone(input, position.Y)) * value
+					vector.create(deadzone(input, position.X), deadzone(input, position.Y)) * modifier
 			end))
 		elseif inputType == UserInputService.TouchSwipe then
 			setVector(true, inputType)
 			table.insert(input.connections, UserInputService.TouchSwipe:Connect(function(direction: Enum.SwipeDirection)
-				input.active[1][UserInputService.TouchSwipe] = value * match(direction) {
+				input.active[1][UserInputService.TouchSwipe] = modifier * match(direction) {
 					Enum.SwipeDirection.Left, vector.create(-1, 0),
 					Enum.SwipeDirection.Right, vector.create(1, 0),
 					Enum.SwipeDirection.Up, vector.create(0, 1),
@@ -230,6 +237,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 				}
 			end))
 		elseif inputType == UserInputService.TouchPinch then
+			setVector(autoType, inputType)
 			table.insert(input.connections, UserInputService.TouchPinch:Connect(function(_, scale: number, _, state, sunk)
 				if state == Enum.UserInputState.End then
 					input.active[1][UserInputService.TouchPinch] = nil
@@ -238,6 +246,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 				input.active[1][UserInputService.TouchPinch] = scale :: number & T
 			end))
 		else
+			setVector(autoType, inputType)
 			table.insert(group, inputType)
 		end
 	end

@@ -1,5 +1,5 @@
 name = "killergg/axis"
-version = "0.2.0"
+version = "0.2.1"
 description = "An agnostic, simple and versatile input library for ECS"
 authors = ["NeonD00m", "As8D"]
 repository = "https://github.com/neond00m/Axis"
@@ -9,7 +9,7 @@ includes = [
   "pesde.toml",
   "README.md",
   "LICENSE",
-  "src",
+  "src/**",
 ]
 
 [target]

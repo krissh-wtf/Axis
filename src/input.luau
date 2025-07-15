@@ -18,23 +18,17 @@ local function deadzone<T>(input: types.Input<T>, value: number): number
 	return value
 end
 
-local function getGamepad(inputType)
-	if inputType == Enum.UserInputType.Gamepad2 then
-		return 2
-	elseif inputType == Enum.UserInputType.Gamepad3 then
-		return 3
-	elseif inputType == Enum.UserInputType.Gamepad4 then
-		return 4
-	elseif inputType == Enum.UserInputType.Gamepad5 then
-		return 5
-	elseif inputType == Enum.UserInputType.Gamepad6 then
-		return 6
-	elseif inputType == Enum.UserInputType.Gamepad7 then
-		return 7
-	elseif inputType == Enum.UserInputType.Gamepad8 then
-		return 8
-	end
-	return 1
+--[=[
+	@within Input
+	@method getGamepad
+	@param inputType
+	@return number
+	Returns the gamepad index of the given inputType, -1 if not a gamepad
+]=]
+local function getGamepad(inputType: Enum.UserInputType)
+	-- subtract from the Gamepad1 value to get the input
+	if inputType.Value < Enum.UserInputType.Gamepad1.Value or inputType.Value > Enum.UserInputType.Gamepad8.Value then return -1 end
+	return inputType.Value - Enum.UserInputType.Gamepad1.Value + 1
 end
 
 local function _reset<T>(input: types.Input<T>, controller: number, inputType: any)
@@ -185,7 +179,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 		local modifier = if type(index) == "number" then 1 else value
 		newMap[index] = nil :: nil & T
 		newMap[inputType] = value
-		local autoType = if type(modifier) ~= "number" then true else false
+		local autoType = type(modifier) ~= "number"
 
 		if inputType == Enum.UserInputType.MouseMovement then
 			setVector(true, inputType)

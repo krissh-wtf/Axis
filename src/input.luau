@@ -23,11 +23,11 @@ end
 	@method getGamepad
 	@param inputType
 	@return number
-	Returns the gamepad index of the given inputType, -1 if not a gamepad
+	Returns the gamepad index of the given inputType, 1 if not a gamepad
 ]=]
 local function getGamepad(inputType: Enum.UserInputType)
 	-- subtract from the Gamepad1 value to get the input
-	if inputType.Value < Enum.UserInputType.Gamepad1.Value or inputType.Value > Enum.UserInputType.Gamepad8.Value then return -1 end
+	if inputType.Value < Enum.UserInputType.Gamepad1.Value or inputType.Value > Enum.UserInputType.Gamepad8.Value then return 1 end
 	return inputType.Value - Enum.UserInputType.Gamepad1.Value + 1
 end
 

@@ -177,7 +177,6 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	for index, value in keyMap :: any do
 		local inputType = if type(index) == "number" then value else index
 		local modifier = if type(index) == "number" then 1 else value
-		newMap[index] = nil :: nil & T
 		newMap[inputType] = value
 		local autoType = type(modifier) ~= "number"
 
@@ -259,7 +258,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 			end
 
 			active[enum] = (if inputObject.UserInputState == Enum.UserInputState.Begin or
-				inputObject.UserInputState == Enum.UserInputState.Change then keyMap[enum] else nil) :: (nil & T)
+				inputObject.UserInputState == Enum.UserInputState.Change then input.inputMap[enum] else nil) :: (nil & T)
 		end
 	end
 	table.insert(input.connections, UserInputService.InputBegan:Connect(inputBeganOrEnded))

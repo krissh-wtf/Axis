@@ -11,3 +11,5 @@
 - Check out the (incomplete) [documentation](https://neond00m.github.io/Axis/)
 
 - Play the [example game](http://rblx.games/119823868761655)
+
+- Install on [pesde](https://pesde.dev/packages/killergg/axis)

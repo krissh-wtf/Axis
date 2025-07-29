@@ -177,7 +177,8 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	for index, value in keyMap :: any do
 		local inputType = if type(index) == "number" then value else index
 		local modifier = if type(index) == "number" then 1 else value
-		newMap[inputType] = value
+		-- print(`received {index} -> {value}, newmap[{inputType}] = {modifier}`)
+		newMap[inputType] = modifier
 		local autoType = type(modifier) ~= "number"
 
 		if inputType == Enum.UserInputType.MouseMovement then

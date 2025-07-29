@@ -173,6 +173,7 @@ local function map<T>(input: types.Input<T>, keyMap: types.Map<T>)
 	--set up connections
 	local group =  {}
 	local newMap = {}
+	input.keyMap = keyMap
 	input.inputMap = newMap
 	for index, value in keyMap :: any do
 		local inputType = if type(index) == "number" then value else index

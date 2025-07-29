@@ -30,7 +30,8 @@ export type Input<T> = {
     active: { { [any]: T } },
     resets: { [any]: { any } },
     connections: { RBXScriptConnection },
-    inputMap: Map<T>,
+    keyMap: Map<T>,
+    inputMap: { [Enum.KeyCode | Enum.UserInputType]: T },
 }
 
 export type InputConstructor = <T>(Map<T> | (Map<T> & { deadzone: number? })) -> Input<T>
